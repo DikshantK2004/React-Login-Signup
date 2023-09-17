@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export default function Signup() {
     const [activeIndex, setActive] = useState("username");
-    const [data, setData] = useState({email :'', username : '', password:''})
+    const [data, setData] = useState({email :'', username : '', password:'', pass:''})
     const [visible, setVisible] = useState(false);
 
     const notify_error = (message) => toast.error(message, {
@@ -24,7 +24,7 @@ export default function Signup() {
       });
     const colour = "#F2F7A180";
 
-    console.log(data);
+
     const handleFocus = (event) => {
         if (event.target.name === "username") setActive("username")
         else if (event.target.name === "password") setActive("password");
@@ -42,7 +42,7 @@ export default function Signup() {
 
   const confirmPass = (pass, password) => {
     if(pass === password) return true;
-    
+  
     notify_error("The passwords should match.");
     return false;
 
@@ -52,14 +52,26 @@ export default function Signup() {
         if(event.target.name === "username") setData({...data, username: event.target.value });
         else if(event.target.name === "password") setData({...data, password : event.target.value});
         else if(event.target.name === "email") setData({...data, email: event.target.value});
+        else if(event.target.name === 'pass') setData({...data, pass: event.target.value });
     }
 
-    const handleSubmit = () =>
+    const handleSubmit = async () =>
     {
+      console.log(data);
         if(validateEmail(data.email) && confirmPass(data.pass, data.password))
         {
-          return toast("Ready to submit")
+          const fetchData = await fetch(`http://localhost:3001/`, {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+
+          console.log(fetchData);
         }
+
+        
 
 
     }
