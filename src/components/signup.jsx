@@ -7,11 +7,12 @@ import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function Log() {
+export default function Signup() {
     const [activeIndex, setActive] = useState("username");
     const [data, setData] = useState({email :'', username : '', password:''})
     const [visible, setVisible] = useState(false);
-    const notify_error = () => toast.error('Please Enter valid emails only', {
+
+    const notify_error = (message) => toast.error(message, {
       position: "top-center",
       autoClose: 1003,
       hideProgressBar: false,
@@ -28,15 +29,25 @@ export default function Log() {
         if (event.target.name === "username") setActive("username")
         else if (event.target.name === "password") setActive("password");
         else if(event.target.name === "email") setActive("email");
+        else if(event.target.name === "pass") setActive("pass");
     }
     const validateEmail = (email) => {
       const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
       if (!emailRegex.test(email)) {
-          notify_error();
+          notify_error("Please enter a valid email");
           return false;
       } 
       return true;
   };
+
+  const confirmPass = (pass, password) => {
+    if(pass === password) return true;
+    
+    notify_error("The passwords should match.");
+    return false;
+
+
+  }
     const handleChange = (event) =>{
         if(event.target.name === "username") setData({...data, username: event.target.value });
         else if(event.target.name === "password") setData({...data, password : event.target.value});
@@ -45,28 +56,35 @@ export default function Log() {
 
     const handleSubmit = () =>
     {
-        if(validateEmail(data.email))
+        if(validateEmail(data.email) && confirmPass(data.pass, data.password))
         {
           return toast("Ready to submit")
         }
+
+
     }
     return (
 
-      <div className="App">
+        <div className="App">
         <div className='cent'>
           <div id='this'>
-           
-          
         <div className='log'>
 
             <FontAwesomeIcon icon={faUser} style={{ color: "#35A29F", height: "150px", margin: "20px" }} />
             <br />
+            {/* box for userName */}
+            <div className='box' >
+            <div style={{ fontSize: "30px", margin: "10px", color: (activeIndex === "username" ? "#F2F7A1"  : colour  ) }}> UserName </div>
+            <Input type= "text" name = "username" style={{ marginBottom: "10px", color: "#E4F1FF", textAlign: "center" }} onFocus={handleFocus} value = {data.username} onChange={handleChange}> </Input>
+            </div>
+
 
             {/* box for email id */}
             <div className='box' >
             <div style={{ fontSize: "30px", margin: "10px", color: (activeIndex === "email" ? "#F2F7A1"  : colour  ) }}> Email </div>
             <Input type= "text" name = "email" style={{ marginBottom: "10px", color: "#E4F1FF", textAlign: "center" }} onFocus={handleFocus} value = {data.email} onChange={handleChange}> </Input>
             </div>
+
 
             {/* box for password */}
 
@@ -100,7 +118,23 @@ export default function Log() {
 
 
             
-            
+            {/* box for confirm password */}
+
+
+            <div className='box'>
+            <div style={{ fontSize: "30px", margin: "10px", color: (activeIndex === "password" ? "#F2F7A1" : colour) }}> Confirm Password </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Input
+                type= "password"
+                style={{ marginBottom: "10px", color: "#E4F1FF", textAlign: "center", flex: 1 }}
+                onFocus={handleFocus}
+                name="pass"
+                value={data.pass}
+                onChange={handleChange}
+              />
+            </div>
+            </div>
+
             <Button variant="outlined" onClick={handleSubmit}> Submit </Button>
 
             <ToastContainer
