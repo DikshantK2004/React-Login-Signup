@@ -5,14 +5,15 @@ import { Button } from '@mui/material';
 import { Input } from '@mui/material';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Signup() {
+  const navigate = useNavigate();
     const [activeIndex, setActive] = useState("username");
     const [data, setData] = useState({email :'', username : '', password:'', pass:''})
     const [visible, setVisible] = useState(false);
-
-    const notify_error = (message) => toast.error(message, {
+    const toastTheme  ={
       position: "top-center",
       autoClose: 1003,
       hideProgressBar: false,
@@ -21,19 +22,11 @@ export default function Signup() {
       draggable: true,
       progress: undefined,
       theme: "colored",
-      });
+      };
+    const notify_error = (message) =>  toast.error(message, toastTheme);
 
 
-      const notify_success = (message) => toast.success(message, {
-        position: "top-center",
-        autoClose: 1003,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        });
+      const notify_success = (message) => toast.success(message, toastTheme);
     const colour = "#F2F7A180";
 
 
@@ -79,12 +72,20 @@ export default function Signup() {
             },
             body: JSON.stringify(data),
           });
-          fetchData = await fetchData.json();
-          console.log(fetchData);
+          const Data = await fetchData.json();
+          console.log(Data);
 
-          if(fetchData.alert === true)  notify_success("Signup Successful");
-          else notify_error(fetchData.message);
-          
+          if(Data.alert === true)  notify_success("Signup Successful");
+          else if(Data.alert === "Login?") 
+          {
+            const toastId = toast.error(() => (<span>
+              Email already exists,{" "}
+              <span style = {{color: colour}}onClick={() => {navigate("/"); toast.dismiss(toastId);}}>
+                Login Instead
+              </span>
+            </span>), {...toastTheme, theme: "dark"});
+          }
+          else notify_error(Data.message);
         }
     }
     return (

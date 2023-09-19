@@ -6,12 +6,16 @@ import { Input } from '@mui/material';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Log() {
+    const navigate = useNavigate();
     const [activeIndex, setActive] = useState("username");
-    const [data, setData] = useState({email :'', username : '', password:''})
+    const [data, setData] = useState({email :'', password:''})
     const [visible, setVisible] = useState(false);
-    const notify_error = () => toast.error('Please Enter valid emails only', {
+    const notify_error = (message) => toast.error(message, toastTheme);
+
+    const toastTheme  ={
       position: "top-center",
       autoClose: 1003,
       hideProgressBar: false,
@@ -20,35 +24,58 @@ export default function Log() {
       draggable: true,
       progress: undefined,
       theme: "colored",
-      });
+      };
+      const notify_success = (message) => toast.success(message, toastTheme);
+
     const colour = "#F2F7A180";
 
     console.log(data);
     const handleFocus = (event) => {
-        if (event.target.name === "username") setActive("username")
-        else if (event.target.name === "password") setActive("password");
+        if (event.target.name === "password") setActive("password");
         else if(event.target.name === "email") setActive("email");
     }
+
     const validateEmail = (email) => {
       const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
       if (!emailRegex.test(email)) {
-          notify_error();
+          notify_error("Please enter a valid email");
           return false;
       } 
       return true;
   };
+
     const handleChange = (event) =>{
-        if(event.target.name === "username") setData({...data, username: event.target.value });
-        else if(event.target.name === "password") setData({...data, password : event.target.value});
+        if(event.target.name === "password") setData({...data, password : event.target.value});
         else if(event.target.name === "email") setData({...data, email: event.target.value});
     }
 
-    const handleSubmit = () =>
+    const handleSubmit = async () =>
     {
-        if(validateEmail(data.email))
+      console.log(data);
+      if(validateEmail(data.email) )
+      {
+        const fetchData = await fetch(`http://localhost:3001/login`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        const Data = await fetchData.json();
+        console.log(Data);
+
+        if(Data.alert === true)  notify_success(Data.message);
+        else if(Data.alert === "Signup?")
         {
-          return toast("Ready to submit")
+          const toastId = toast.error(() => (<span>
+            Email doesn't exist,{" "}
+            <span style = {{color: colour}}onClick={() => {navigate("/signup"); toast.dismiss(toastId);}}>
+              Signup Instead
+            </span>
+          </span>), {...toastTheme, theme: "dark"});
         }
+        else notify_error(Data.message);
+      }
     }
     return (
 

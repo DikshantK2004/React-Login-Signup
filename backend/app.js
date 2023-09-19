@@ -34,7 +34,7 @@ app.post("/signup", async (req, res) => {
   console.log(user);
   if (user) {
     res.send({
-      alert: false,
+      alert: "Login?",
       message: "User Already exists, Please try Logging in",
     });
   } else {
@@ -54,7 +54,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.get("/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   const email = req.body.email, password = req.body.password;
 
   let user = await User.findOne({ email: email });
@@ -73,13 +73,13 @@ app.get("/login", async (req, res) => {
 
     res.send({
       alert: true,
-      message: "User Exists",
+      message: "Successfully Logged in.",
       data: user,
     });
   } else {
     return res.send({
       message: "Please Sign up",
-      alert: false,
+      alert: "Signup?",
     });
   }
 });
