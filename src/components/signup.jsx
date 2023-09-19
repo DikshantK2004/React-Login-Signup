@@ -22,6 +22,18 @@ export default function Signup() {
       progress: undefined,
       theme: "colored",
       });
+
+
+      const notify_success = (message) => toast.success(message, {
+        position: "top-center",
+        autoClose: 1003,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
     const colour = "#F2F7A180";
 
 
@@ -60,20 +72,20 @@ export default function Signup() {
       console.log(data);
         if(validateEmail(data.email) && confirmPass(data.pass, data.password))
         {
-          const fetchData = await fetch(`http://localhost:3001/`, {
+          const fetchData = await fetch(`http://localhost:3001/signup`, {
             method: "POST",
             headers: {
               "content-type": "application/json",
             },
             body: JSON.stringify(data),
           });
-
+          fetchData = await fetchData.json();
           console.log(fetchData);
+
+          if(fetchData.alert === true)  notify_success("Signup Successful");
+          else notify_error(fetchData.message);
+          
         }
-
-        
-
-
     }
     return (
 
@@ -134,7 +146,7 @@ export default function Signup() {
 
 
             <div className='box'>
-            <div style={{ fontSize: "30px", margin: "10px", color: (activeIndex === "password" ? "#F2F7A1" : colour) }}> Confirm Password </div>
+            <div style={{ fontSize: "30px", margin: "10px", color: (activeIndex === "pass" ? "#F2F7A1" : colour) }}> Confirm Password </div>
             <div style={{ display: "flex", alignItems: "center" }}>
               <Input
                 type= "password"

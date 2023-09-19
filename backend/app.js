@@ -35,14 +35,15 @@ app.post("/signup", async (req, res) => {
   if (user) {
     res.send({
       alert: false,
-      message: "User Already exists",
+      message: "User Already exists, Please try Logging in",
     });
   } else {
     let user_save = new User(data);
+    console.log(user_save);
     user_save = await user_save.save();
     if (!user_save) {
       return res.send({
-        message: "Can't Sign in",
+        message: "Can't Sign Up",
         alert: false,
       });
     }
@@ -53,12 +54,23 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.get("/login/:email", async (req, res) => {
-  const email = req.params.email;
+app.get("/login", async (req, res) => {
+  const email = req.body.email, password = req.body.password;
 
-  const user = await User.findOne({ email: email });
+  let user = await User.findOne({ email: email });
 
   if (user) {
+
+
+    user = await User.findOne({email: email, password: password});
+    if(!user)
+    {
+      res.send({
+        alert:false,
+        message: "Password is incorrect"
+      })
+    }
+
     res.send({
       alert: true,
       message: "User Exists",
